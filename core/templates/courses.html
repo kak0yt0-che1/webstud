@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+  <style>
+    .course-card {
+      background: #0e1a24;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .course-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+    }
+
+    .course-title {
+      font-size: 24px;
+      color: #00e5ff;
+      margin: 0;
+    }
+
+    .course-desc {
+      color: #a0a0a0;
+      margin: 10px 0 20px;
+    }
+
+    .course-button {
+      display: inline-block;
+      background: linear-gradient(145deg, #072f41, #0b3f59);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid #00e5ff55;
+      box-shadow: 0 0 8px #00e5ff55;
+      transition: 0.3s;
+    }
+
+    .course-button:hover {
+      background: #00bcd4;
+      color: white;
+      box-shadow: 0 0 12px #00e5ff;
+      transform: scale(1.03);
+    }
+
+    .course-list-title {
+      font-size: 30px;
+      color: #00e5ff;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #00e5ff;
+    }
+  </style>
+
+  <h2 class="course-list-title">📘 Список курсов</h2>
+
+  {% for course in courses %}
+    <div class="course-card">
+      <h3 class="course-title">{{ course.title }}</h3>
+      <p class="course-desc">{{ course.description }}</p>
+      <a href="{% url 'course_detail' course.id %}" class="course-button">Перейти к курсу</a>
+    </div>
+  {% empty %}
+    <p>Пока нет доступных курсов.</p>
+  {% endfor %}
+{% endblock %}

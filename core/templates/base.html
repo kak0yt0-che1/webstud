@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>WebStudy</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #0f2027;
+    }
+
+    .navbar {
+      width: 100%;
+      background: rgba(20, 20, 30, 0.9);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      backdrop-filter: blur(6px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      color: #00e5ff;
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+      text-shadow: 0 0 8px #00e5ff;
+      padding: 8px 16px;
+      background: #1c1c2b;
+      border-radius: 10px;
+      box-shadow: 0 0 12px #00e5ff60;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-links a,
+    .logout-form button {
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #1c1c2b, #26263c);
+      border: 1px solid #00e5ff33;
+      text-decoration: none;
+      transition: all 0.3s;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .nav-links a:hover,
+    .logout-form button:hover {
+      background: #00bcd4;
+      color: #fff;
+      box-shadow: 0 0 10px #00e5ff;
+    }
+
+    .logout-form {
+      margin: 0;
+    }
+
+    .logout-form button {
+      border: none;
+      cursor: pointer;
+      background: none;
+    }
+
+    .container {
+      margin-top: 90px;
+      padding: 30px;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Навигационная панель -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="nav-logo">🚀 WebStudy</a>
+      <div class="nav-links">
+        <a href="{% url 'course_list' %}">Курсы</a>
+        {% if user.is_authenticated %}
+          <a href="/profile/">Профиль</a>
+          {% if user.is_superuser %}
+            <a href="{% url 'add_course' %}">Курс+</a>
+            <a href="{% url 'add_module' %}">Модуль+</a>
+            <a href="{% url 'add_lesson' %}">Урок+</a>
+            <a href="/admin/">Админка</a>
+          {% endif %}
+          <form action="{% url 'logout' %}" method="post" class="logout-form">
+            {% csrf_token %}
+            <button type="submit">Выйти</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Войти</a>
+          <a href="{% url 'register' %}">Регистрация</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Контент страницы -->
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="{% static 'js/editor.js' %}?v=1"></script>
+</body>
+</html>

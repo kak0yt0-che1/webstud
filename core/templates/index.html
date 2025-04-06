@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+  <!-- Анимированный фон -->
+  <div id="background-animation"></div>
+
+  <!-- Основной приветственный контент -->
+  <div class="welcome-container">
+    <h1 class="fade-in">👋 Добро пожаловать в <strong>WebStudy</strong>!</h1>
+    <p class="fade-in delay-1">🚀 Платформа для интерактивного обучения. Учись, кодь, прокачивайся!</p>
+
+    <a href="{% url 'course_list' %}" class="cta-button fade-in delay-2">📚 Перейти к курсам</a>
+  </div>
+
+  <style>
+    body {
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* Анимированный фон */
+    #background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(#0f2027, #203a43, #2c5364);
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 0.3; }
+      50% { transform: translateY(-20px); opacity: 0.7; }
+      100% { transform: translateY(0); opacity: 0.3; }
+    }
+
+    #background-animation::before, #background-animation::after {
+      content: "";
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background-image: radial-gradient(#00e5ff 1px, transparent 1px),
+                        radial-gradient(#00e5ff 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: float 8s ease-in-out infinite;
+      opacity: 0.15;
+    }
+
+    #background-animation::after {
+      top: -20%;
+      left: -20%;
+      background-size: 70px 70px;
+      animation-duration: 12s;
+    }
+
+    /* Контейнер с приветствием */
+    .welcome-container {
+      text-align: center;
+      padding: 100px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-container h1 {
+      font-size: 48px;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .welcome-container p {
+      font-size: 20px;
+      color: #e0e0e0;
+      margin-bottom: 40px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 14px 30px;
+      background: #00bcd4;
+      color: white;
+      border-radius: 10px;
+      font-size: 18px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+      box-shadow: 0 0 10px #00bcd4;
+    }
+
+    .cta-button:hover {
+      background: #0097a7;
+      box-shadow: 0 0 20px #00bcd4;
+    }
+
+    /* Анимации */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-out;
+    }
+
+    .delay-1 {
+      animation-delay: 0.5s;
+    }
+
+    .delay-2 {
+      animation-delay: 1s;
+    }
+  </style>
+{% endblock %}

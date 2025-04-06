@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2 style="font-size: 200%; color: #00e5ff; text-shadow: 0 0 15px #00e5ff; margin-bottom: 30px;">
+    Профиль: {{ user.username }}
+  </h2>
+
+  <style>
+    .course-card {
+      margin-bottom: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #101f2b;
+      border: 1px solid #00e5ff44;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 5px transparent;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+
+    .course-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px #00e5ff88;
+      border-color: #00e5ff;
+    }
+
+    .course-card h3 {
+      color: #00e5ff;
+      margin-bottom: 8px;
+    }
+
+    .course-card p {
+      color: #00bcd4;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .plus-box {
+      margin-top: 40px;
+      padding: 25px;
+      background: #111927;
+      border: 1px solid #00e5ff55;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 0 15px #00e5ff33;
+    }
+
+    .plus-box p {
+      font-size: 18px;
+      font-weight: bold;
+      color: #00e5ff;
+      text-shadow: 0 0 5px #00e5ff;
+    }
+
+    .plus-box a {
+      margin-top: 15px;
+      display: inline-block;
+      background: linear-gradient(145deg, #00e5ff, #00bcd4);
+      color: #000;
+      padding: 12px 26px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 0 12px #00e5ff88;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .plus-box a:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 20px #00e5ff;
+    }
+  </style>
+
+  {% if user.is_subscribed %}
+    {% if progress_data %}
+      {% for item in progress_data %}
+        <a href="{% url 'course_detail' item.course.id %}" class="course-card">
+          <h3>{{ item.course.title }}</h3>
+          <div style="position: relative; background: #0b1a24; border-radius: 25px; height: 25px; width: 100%; margin-top: 10px;">
+            <div style="
+              width: {{ item.percent|default:'0' }}%;
+              background: linear-gradient(90deg, #00e5ff, #00bcd4);
+              height: 100%;
+              border-radius: 25px;
+              box-shadow: 0 0 10px #00e5ff99;
+              transition: width 0.5s;">
+            </div>
+            <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-weight: bold; color: #fff;">
+              {{ item.percent }}%
+            </div>
+          </div>
+          <p style="margin-top: 8px;">{{ item.completed }} из {{ item.total }} уроков пройдено</p>
+        </a>
+      {% endfor %}
+    {% else %}
+      <p style="color: #ccc;">Вы ещё не записаны ни на один курс.</p>
+    {% endif %}
+  {% else %}
+    {% for item in progress_data %}
+      <a href="{% url 'course_detail' item.course.id %}" class="course-card">
+        <h3>{{ item.course.title }}</h3>
+        <p>Перейти к курсу</p>
+      </a>
+    {% endfor %}
+    <div class="plus-box">
+      <p>Чтобы отслеживать прогресс, приобретите подписку <span style="color: #ffeb3b;">PLUS</span></p>
+      <a href="https://t.me/baaukanr" target="_blank">Купить PLUS</a>
+    </div>
+  {% endif %}
+{% endblock %}

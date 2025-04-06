@@ -1,0 +1,40 @@
+{% load static %}
+
+{% if lesson.task_type == 'html' %}
+  <h3>HTML задание:</h3>
+  <p>{{ lesson.html_task_description }}</p>
+
+  <h4>HTML</h4>
+  <textarea id="code-html" rows="10" cols="80" placeholder="<h1>Hello</h1>"></textarea><br>
+
+  <!-- Кнопка со старым onclick -->
+  <button onclick="runHTMLCode()">▶ Запустить</button>
+
+  <h3>Результат:</h3>
+  <iframe id="preview" style="width:100%; height:300px; border:1px solid #ccc;"></iframe>
+
+  <!-- Подключение CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+
+  <!-- Передаём данные из Django -->
+  <script>
+    window.codeExpectedOutput = "{{ lesson.code_expected_output|escapejs }}";
+    window.lessonId = "{{ lesson.id|escapejs }}";
+
+    // Инициализация CodeMirror
+    window.htmlEditor = CodeMirror.fromTextArea(document.getElementById("code-html"), {
+      mode: "htmlmixed",
+      theme: "default",
+      lineNumbers: true,
+      tabSize: 2
+    });
+
+    // Начальный код по желанию
+    window.htmlEditor.setValue("<h1>Hello World!!</h1>");
+  </script>
+
+  <!-- Подключаем глобальный editor.js -->
+  <script src="{% static 'js/editor.js' %}?v=2"></script>
+{% endif %}
