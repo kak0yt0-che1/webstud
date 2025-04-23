@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import Course, Module, UserLessonProgress, Lesson
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
 
 @login_required
 def module_detail(request, module_id):
@@ -195,3 +198,18 @@ def signup_view(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            request.user.used_temp_password = False
+            request.user.save()
+            update_session_auth_hash(request, form.user)
+            return redirect('profile')  # или '/'
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'registration/change_password.html', {'form': form})
