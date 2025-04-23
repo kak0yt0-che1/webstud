@@ -52,9 +52,70 @@
       margin-bottom: 30px;
       text-shadow: 0 0 10px #00e5ff;
     }
+
+    .filter-form {
+      margin-bottom: 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-form input,
+    .filter-form select {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: #101f2b;
+      color: #00e5ff;
+      box-shadow: 0 0 8px #00e5ff44;
+    }
+
+    .filter-form button {
+      background: #00e5ff;
+      border: none;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 0 8px #00e5ff;
+      cursor: pointer;
+    }
+
+    .filter-form button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #00e5ff;
+    }
+    .filter-form input,
+    .filter-form select {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid #00e5ff66;
+      outline: none;
+      background: #0e1a24;
+      color: #00e5ff;
+      box-shadow: 0 0 10px #00e5ff22 inset;
+    }
+
   </style>
 
   <h2 class="course-list-title">📘 Список курсов</h2>
+
+  <form method="get" class="filter-form">
+    <input type="text" name="q" placeholder="🔍 Поиск по названию" value="{{ request.GET.q }}">
+    
+    <select name="language">
+      <option value="">Все языки</option>
+      <option value="HTML" {% if request.GET.language == 'HTML' %}selected{% endif %}>HTML</option>
+      <option value="Go" {% if request.GET.language == 'Go' %}selected{% endif %}>Go</option>
+      <option value="Python" {% if request.GET.language == 'Python' %}selected{% endif %}>Python</option>
+    </select>
+  
+    <button type="submit">🔍 Найти</button>
+  </form>
+  
+  
 
   {% for course in courses %}
     <div class="course-card">

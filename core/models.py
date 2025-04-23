@@ -24,13 +24,24 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
     
+from django.db import models
+
 class Course(models.Model):
+    LANGUAGE_CHOICES = [
+        ('HTML', 'HTML'),
+        ('Go', 'Go'),
+        ('Python', 'Python'),
+    ]
+
     title = models.CharField(max_length=200)
     description = models.TextField()
+    language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, default='HTML')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+
+
 
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')

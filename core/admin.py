@@ -2,17 +2,23 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Course, Module, Lesson, UserLessonProgress
 
-# Курсы, уроки, модули
-admin.site.register(Course)
+# --- Курсы с фильтрами по языку ---
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'language', 'created_at')
+    list_filter = ('language',)
+    search_fields = ('title', 'description')
+
+# --- Модули и уроки ---
 admin.site.register(Module)
 admin.site.register(Lesson)
 
-# Inline для отображения прогресса прямо у пользователя
+# --- Inline для отображения прогресса у пользователя ---
 class ProgressInline(admin.TabularInline):
     model = UserLessonProgress
     extra = 0
 
-# Расширяем UserAdmin
+# --- Кастомный UserAdmin ---
 class CustomUserAdmin(UserAdmin):
     inlines = [ProgressInline]
     list_display = ('username', 'email', 'is_subscribed', 'is_staff')
@@ -27,7 +33,7 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 
-# Админка для прогресса
+# --- Админка для прогресса пользователя ---
 @admin.register(UserLessonProgress)
 class UserLessonProgressAdmin(admin.ModelAdmin):
     list_display = ('user', 'lesson', 'is_completed', 'completed_at')

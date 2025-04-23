@@ -160,8 +160,18 @@ def add_lesson(request):
 
 @login_required
 def course_list(request):
-    courses = Course.objects.prefetch_related('modules__lessons')
+    courses = Course.objects.all()
+    q = request.GET.get('q')
+    language = request.GET.get('language')
+
+    if q:
+        courses = courses.filter(title__icontains=q)
+    if language:
+        courses = courses.filter(language__iexact=language)  # ← 🔥 важно
+
     return render(request, 'courses.html', {'courses': courses})
+
+
 
 @csrf_exempt
 @login_required
