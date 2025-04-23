@@ -19,6 +19,7 @@ class UserLessonProgress(models.Model):
 
 class CustomUser(AbstractUser):
     is_subscribed = models.BooleanField(default=False)
+    used_temp_password = models.BooleanField(default=False)  # 🔥 Добавили это поле
 
     def __str__(self):
         return self.username

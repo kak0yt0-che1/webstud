@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from .views import change_password
+from .views import send_temp_password
+
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -17,4 +19,5 @@ urlpatterns = [
     path('modules/<int:module_id>/uncomplete/', views.uncomplete_module, name='uncomplete_module'),
     path('modules/<int:module_id>/', views.module_detail, name='module_detail'),
     path('change-password/', change_password, name='change_password'),
+    path('temp-password/', send_temp_password, name='send_temp_password'),
 ]

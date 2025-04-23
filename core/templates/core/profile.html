@@ -3,6 +3,7 @@
   <h2 style="font-size: 200%; color: #00e5ff; text-shadow: 0 0 15px #00e5ff; margin-bottom: 30px;">
     Профиль: {{ user.username }}
   </h2>
+  <a href="{% url 'change_password' %}" class="btn-change-password">Сменить пароль</a>
 
   <style>
     .course-card {
@@ -68,6 +69,16 @@
     .plus-box a:hover {
       transform: scale(1.08);
       box-shadow: 0 0 20px #00e5ff;
+    }
+    .btn-change-password {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      background-color: #00e5ff;
+      color: #000;
+      font-weight: bold;
+      border-radius: 6px;
+      text-decoration: none;
     }
   </style>
 

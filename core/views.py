@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,6 +10,8 @@ from django.utils import timezone
 from .models import Course, Module, UserLessonProgress, Lesson
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
 
 
 @login_required
@@ -213,3 +215,25 @@ def change_password(request):
         form = PasswordChangeForm(user=request.user)
 
     return render(request, 'registration/change_password.html', {'form': form})
+
+def send_temp_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+            temp_password = get_random_string(length=8)
+            user.set_password(temp_password)
+            user.used_temp_password = True  # ✅ важно!
+            user.save()
+            send_mail(
+                'Временный пароль',
+                f'Ваш временный пароль: {temp_password}',
+                'noreply@webstudy.kz',
+                [email],
+                fail_silently=False,
+            )
+            return render(request, 'registration/temp_password_sent.html')
+        except User.DoesNotExist:
+            return render(request, 'registration/temp_password_form.html', {'error': 'Пользователь не найден'})
+    return render(request, 'registration/temp_password_form.html')
