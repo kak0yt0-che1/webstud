@@ -20,4 +20,5 @@ urlpatterns = [
     path('modules/<int:module_id>/', views.module_detail, name='module_detail'),
     path('change-password/', change_password, name='change_password'),
     path('temp-password/', send_temp_password, name='send_temp_password'),
+    
 ]

@@ -184,7 +184,12 @@ def lesson_detail(request, lesson_id):
         correct_answer = lesson.test_correct_answer.strip().lower() if lesson.test_correct_answer else ''
         result = (user_answer == correct_answer)
 
-    return render(request, 'core/lesson_detail.html', {'lesson': lesson, 'result': result})
+    return render(request, 'core/lesson_detail.html', {
+        'lesson': lesson,
+        'result': result,
+        'expected_output': lesson.html_expected_code or ''
+    })
+
 
 
 

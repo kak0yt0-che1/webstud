@@ -10,23 +10,19 @@
       border: 1px solid rgba(0, 229, 255, 0.2);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
     .module-card:hover {
       transform: scale(1.02);
       box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
     }
-
     .module-title {
       font-size: 22px;
       color: #00e5ff;
       margin-bottom: 10px;
     }
-
     .lesson-list {
       padding-left: 20px;
       color: #b0eaff;
     }
-
     .module-button {
       margin-top: 15px;
       display: inline-block;
@@ -39,14 +35,11 @@
       box-shadow: 0 0 8px #00e5ff55;
       transition: 0.3s;
     }
-
     .module-button:hover {
       background: #00bcd4;
-      color: white;
       box-shadow: 0 0 12px #00e5ff;
       transform: scale(1.03);
     }
-
     .course-header {
       font-size: 51px;
       color: #00e5ff;
@@ -54,7 +47,6 @@
       text-align: center;
       margin-bottom: 15px;
     }
-
     .course-description {
       color: #a0a0a0;
       margin-bottom: 30px;
@@ -69,14 +61,12 @@
   {% for module in modules %}
     <div class="module-card">
       <h4 class="module-title">{{ module.title }}</h4>
-
       {% if module.lessons.all %}
         <ul class="lesson-list">
           {% for lesson in module.lessons.all %}
             <li>{{ lesson.title }}</li>
           {% endfor %}
         </ul>
-
         <a href="{% url 'module_detail' module.id %}" class="module-button">
           Перейти к модулю →
         </a>

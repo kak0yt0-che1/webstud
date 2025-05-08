@@ -1,40 +1,33 @@
-{% load static %}
-
 {% if lesson.task_type == 'html' %}
-  <h3>HTML задание:</h3>
-  <p>{{ lesson.html_task_description }}</p>
+  <h3>{{ lesson.html_task_description }}</h3>
 
-  <h4>HTML</h4>
-  <textarea id="code-html" rows="10" cols="80" placeholder="<h1>Hello</h1>"></textarea><br>
+  <textarea id="codeInput" style="width:100%; height:100px;"></textarea>
+  <button onclick="runTest()">Проверить</button>
+  <iframe id="sandbox" sandbox="allow-scripts" style="width:100%; height:200px;"></iframe>
+  <div id="feedback" style="margin-top: 10px;"></div>
 
-  <!-- Кнопка со старым onclick -->
-  <button onclick="runHTMLCode()">▶ Запустить</button>
-
-  <h3>Результат:</h3>
-  <iframe id="preview" style="width:100%; height:300px; border:1px solid #ccc;"></iframe>
-
-  <!-- Подключение CodeMirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-
-  <!-- Передаём данные из Django -->
   <script>
-    window.codeExpectedOutput = "{{ lesson.code_expected_output|escapejs }}";
-    window.lessonId = "{{ lesson.id|escapejs }}";
+    const expected = `{{ expected_output|escapejs }}`.trim();
 
-    // Инициализация CodeMirror
-    window.htmlEditor = CodeMirror.fromTextArea(document.getElementById("code-html"), {
-      mode: "htmlmixed",
-      theme: "default",
-      lineNumbers: true,
-      tabSize: 2
+    function runTest() {
+      const userCode = document.getElementById("codeInput").value;
+      const iframe = document.getElementById("sandbox");
+      const testScript = `
+        <script>
+          const val = document.getElementById('output')?.innerText || '';
+          parent.postMessage(val, '*');
+        <\/script>
+      `;
+      iframe.srcdoc = `<body>${userCode}${testScript}</body>`;
+    }
+
+    window.addEventListener("message", (e) => {
+      const fb = document.getElementById("feedback");
+      if (e.data.trim() === expected) {
+        fb.innerHTML = '<span style="color: green;">✅ Верно!</span>';
+      } else {
+        fb.innerHTML = '<span style="color: red;">❌ Ожидалось: "' + expected + '". Получено: "' + e.data + '"</span>';
+      }
     });
-
-    // Начальный код по желанию
-    window.htmlEditor.setValue("<h1>Hello World!!</h1>");
   </script>
-
-  <!-- Подключаем глобальный editor.js -->
-  <script src="{% static 'js/editor.js' %}?v=2"></script>
 {% endif %}

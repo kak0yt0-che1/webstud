@@ -1,163 +1,163 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
+
+{% block head_extra %}
+  {# CodeMirror CSS #}
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css"
+  />
   <style>
-    .lesson-card {
-      background: #0e1a24;
-      padding: 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
-      border: 1px solid rgba(0, 229, 255, 0.2);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .CodeMirror {
+      border: 1px solid #555;
+      border-radius: 4px;
+      min-height: 200px;
     }
-
-    .lesson-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
-    }
-
-    .lesson-title {
-      font-size: 22px;
-      color: #00e5ff;
-      margin-bottom: 10px;
-    }
-
-    .lesson-content {
-      color: #cdeeff;
-      margin-bottom: 15px;
-    }
-
-    .editor-area {
-      margin-bottom: 20px;
-    }
-
-    .run-btn {
-      margin-right: 10px;
-      background: #072f41;
-      border: 1px solid #00e5ff55;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 8px;
-      transition: 0.3s;
-      cursor: pointer;
-    }
-
-    .run-btn:hover {
-      background: #00bcd4;
-      box-shadow: 0 0 10px #00e5ff;
-    }
-
-    iframe {
-      border: 1px solid #00e5ff55;
-      border-radius: 6px;
-      background: #ffffff;
-    }
-
-    .complete-btn {
-      margin-top: 30px;
-      background: #072f41;
-      border: 1px solid #00e5ff55;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-weight: bold;
-      box-shadow: 0 0 10px #00e5ff55;
-      transition: 0.3s;
-    }
-
-    .complete-btn:hover {
-      background: #00bcd4;
-      box-shadow: 0 0 15px #00e5ff;
+    /* Скрываем оригинальные textarea */
+    #htmlCode,
+    #jsCode {
+      display: none !important;
     }
   </style>
+{% endblock %}
 
-  <h2 style="font-size: 32px; color: #00e5ff; text-shadow: 0 0 10px #00e5ff; margin-bottom: 30px; text-align: center;">📘 Модуль: {{ module.title }}</h2>
+{% block content %}
+<div class="container my-8">
+  <h2 class="text-3xl text-cyan-400 font-semibold mb-4">🔧 {{ module.title }}</h2>
+  <p class="text-slate-300 mb-8">{{ module.description }}</p>
 
-  {% for lesson in lessons %}
-    <div class="lesson-card">
-      <h4 class="lesson-title">{{ lesson.title }}</h4>
-      <p class="lesson-content">{{ lesson.content }}</p>
-
-      {% if lesson.task_type == 'html' or lesson.task_type == 'html/js' %}
-        <h3 style="color: #00e5ff">HTML задание:</h3>
-        <p style="color: #a0a0a0">{{ lesson.html_task_description }}</p>
-
-        <div class="editor-area">
-          <h4>HTML</h4>
-          <textarea id="code-html-{{ lesson.id }}" rows="10" cols="80" placeholder="<h1>Hello</h1>"></textarea>
-
-          <h4 style="margin-top: 20px;">JS</h4>
-          <textarea id="code-js-{{ lesson.id }}" rows="10" cols="80" placeholder="console.log('Hello')"></textarea>
-        </div>
-
-        <button class="run-btn" onclick="runHTML({{ lesson.id }})">▶ Запустить HTML</button>
-        <button class="run-btn" onclick="runJS({{ lesson.id }})">▶ Запустить JS</button>
-
-        <h3 style="margin-top: 20px; color: #00e5ff">Результат:</h3>
-        <iframe id="preview-{{ lesson.id }}" style="width:100%; height:300px;"></iframe>
-
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-
-        <script>
-          const htmlEditor{{ lesson.id }} = CodeMirror.fromTextArea(document.getElementById("code-html-{{ lesson.id }}"), {
-            mode: "htmlmixed",
-            theme: "default",
-            lineNumbers: true,
-            tabSize: 2
-          });
-
-          const jsEditor{{ lesson.id }} = CodeMirror.fromTextArea(document.getElementById("code-js-{{ lesson.id }}"), {
-            mode: "javascript",
-            theme: "default",
-            lineNumbers: true,
-            tabSize: 2
-          });
-
-          function runHTML(id) {
-            const html = htmlEditor{{ lesson.id }}.getValue();
-            const iframe = document.getElementById(`preview-${id}`);
-            const doc = `<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>${html}</body></html>`;
-            const blob = new Blob([doc], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            iframe.src = url;
-            iframe.onload = () => setTimeout(() => URL.revokeObjectURL(url), 1000);
-          }
-
-          function runJS(id) {
-            const js = jsEditor{{ lesson.id }}.getValue();
-            const iframe = document.getElementById(`preview-${id}`);
-            const doc = `<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>
-              <script>
-                try {
-                  console.log = function(msg) {
-                    document.body.innerHTML += '<pre>' + msg + '</pre>';
-                  };
-                  ${js}
-                } catch(e) {
-                  document.body.innerHTML += '<pre style="color:red;">Ошибка: ' + e.message + '</pre>';
-                }
-              <\/script>
-            </body></html>`;
-            const blob = new Blob([doc], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            iframe.src = url;
-            iframe.onload = () => setTimeout(() => URL.revokeObjectURL(url), 1000);
-          }
-        </script>
-      {% endif %}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- HTML -->
+    <div class="flex flex-col">
+      <label class="text-white mb-2 font-medium">HTML-код:</label>
+      <textarea id="htmlCode"><div id="output">Hello</div></textarea>
+      <div id="htmlEditor"></div>
     </div>
-  {% empty %}
-    <p style="color: #999;">Нет уроков в этом модуле.</p>
-  {% endfor %}
+    <!-- JS -->
+    <div class="flex flex-col">
+      <label class="text-white mb-2 font-medium">JS-код:</label>
+      <textarea id="jsCode">// ваш JS тут</textarea>
+      <div id="jsEditor"></div>
+    </div>
+  </div>
 
-  {% if not module.is_completed %}
-    <form action="{% url 'complete_module' module.id %}" method="post">
-      {% csrf_token %}
-      <button type="submit" class="complete-btn">📘 Модуль выполнен</button>
-    </form>
-  {% endif %}
+  <button id="runBtn"
+          class="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
+  >Запустить</button>
+
+  <h3 class="text-white font-semibold mt-8 mb-2">Результат:</h3>
+  <iframe
+    id="preview"
+    sandbox="allow-scripts allow-same-origin"
+    class="w-full h-56 bg-white border rounded"
+  ></iframe>
+
+  <div id="feedback" class="mt-4 text-lg font-medium"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    // Ожидаемый вывод из БД или null
+    window.expectedOutput = {{ module.expected_output|default:"null"|escapejs }};
+  </script>
+
+  {# Подключаем CodeMirror #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/edit/closetag.min.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1) Инициализируем редакторы
+    const htmlArea = document.getElementById('htmlCode');
+    const jsArea   = document.getElementById('jsCode');
+    window.htmlEditor = CodeMirror(
+      document.getElementById('htmlEditor'),
+      {
+        value: htmlArea.value.trim(),
+        mode: 'xml',
+        htmlMode: true,
+        theme: 'dracula',
+        lineNumbers: true,
+        autoCloseTags: true,
+      }
+    );
+    window.jsEditor = CodeMirror(
+      document.getElementById('jsEditor'),
+      {
+        value: jsArea.value.trim(),
+        mode: 'javascript',
+        theme: 'dracula',
+        lineNumbers: true,
+      }
+    );
+
+    const btn     = document.getElementById('runBtn');
+    const preview = document.getElementById('preview');
+    const fb      = document.getElementById('feedback');
+
+    // Помощник: вытягивает текст из <div id="output">…</div>
+    function extractOutput(html) {
+      const m = html.match(/<div[^>]*id=['"]output['"][^>]*>([\s\S]*?)<\/div>/);
+      return m ? m[1].trim() : '';
+    }
+
+    btn.addEventListener('click', () => {
+      fb.textContent = '';
+      const userHtml = window.htmlEditor.getValue();
+      const userJs   = window.jsEditor.getValue();
+      // Вычисляем expected: из БД или из HTML
+      const expected = window.expectedOutput != null
+        ? String(window.expectedOutput).trim()
+        : extractOutput(userHtml);
+
+      // 2) Навешиваем onload-обработчик перед srcdoc
+      const onLoadHandler = () => {
+        const doc = preview.contentDocument;
+        if (!doc) return;
+        // Инжектим пользовательский JS
+        const s1 = doc.createElement('script');
+        s1.textContent = userJs;
+        doc.body.appendChild(s1);
+        // Инжектим скрипт проверки
+        const s2 = doc.createElement('script');
+        s2.textContent = `
+          (function(){
+            const out = (document.getElementById('output')?.innerText||'').trim();
+            parent.postMessage(out, '*');
+          })();
+        `;
+        doc.body.appendChild(s2);
+        // Снимаем слушатель, чтобы не накопить его
+        preview.removeEventListener('load', onLoadHandler);
+      };
+      preview.addEventListener('load', onLoadHandler);
+
+      // 3) Загружаем чистый HTML
+      preview.srcdoc = `
+        <html><head><meta charset="utf-8"></head>
+        <body>${userHtml}</body>
+        </html>
+      `;
+    });
+
+    // 4) Ловим ответ из iframe и сравниваем
+    window.addEventListener('message', e => {
+      const got = (e.data||'').trim();
+      const userHtml = window.htmlEditor.getValue();
+      const expected = window.expectedOutput != null
+        ? String(window.expectedOutput).trim()
+        : extractOutput(userHtml);
+      fb.innerHTML = got === expected
+        ? '<span class="text-green-400">✅ Верно!</span>'
+        : `<span class="text-red-400">❌ Неверно. Ожидалось: “${expected}”, получено: “${got}”</span>`;
+    });
+  });
+  </script>
 {% endblock %}

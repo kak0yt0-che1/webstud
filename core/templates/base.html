@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>WebStudy</title>
   {% load static %}
+  {% block head_extra %}{% endblock %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <style>
     body {
@@ -122,5 +123,7 @@
   </div>
 
   <script src="{% static 'js/editor.js' %}?v=1"></script>
+  {% block extra_js %}{% endblock %}
+
 </body>
 </html>

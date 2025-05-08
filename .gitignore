@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+
+# Django stuff:
+db.sqlite3
+media/
+
+# Migrations (если не хотите хранить старые миграции)
+core/migrations/
+
+# Virtual env
+venv/
+*.env
