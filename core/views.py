@@ -16,11 +16,11 @@ from django.core.mail import send_mail
 
 @login_required
 def module_detail(request, module_id):
-    module = get_object_or_404(Module, id=module_id)
-    lessons = module.lessons.all()
+    module  = get_object_or_404(Module, pk=module_id)
+    lessons = module.lessons.order_by('id')
     return render(request, 'core/module_detail.html', {
-        'module': module,
-        'lessons': lessons
+        'module':  module,
+        'lessons': lessons,
     })
 
 @csrf_exempt
@@ -41,11 +41,14 @@ def uncomplete_module(request, module_id):
 
 @login_required
 def course_detail(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    modules = course.modules.prefetch_related('lessons')
+    """
+    Страница одного курса: выводим у него список модулей.
+    """
+    course  = get_object_or_404(Course, pk=course_id)
+    modules = course.modules.all().order_by('id')  # или по вашему полю order
     return render(request, 'core/course_detail.html', {
-        'course': course,
-        'modules': modules
+        'course':  course,
+        'modules': modules,
     })
 
 @csrf_exempt
@@ -151,8 +154,8 @@ def add_lesson(request):
     if request.method == 'POST':
         form = LessonForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('/')
+            lesson = form.save()
+            return redirect('module_detail', module_id=lesson.module.id)
     else:
         form = LessonForm()
 
@@ -160,35 +163,40 @@ def add_lesson(request):
 
 @login_required
 def course_list(request):
-    courses = Course.objects.all()
-    q = request.GET.get('q')
-    language = request.GET.get('language')
-
+    """
+    Список всех курсов (тот самый шаблон courses.html).
+    """
+    qs = Course.objects.all()
+    # сюда вы уже умеете вставлять фильтр/поиск
+    q    = request.GET.get('q')
+    lang = request.GET.get('language')
     if q:
-        courses = courses.filter(title__icontains=q)
-    if language:
-        courses = courses.filter(language__iexact=language)  # ← 🔥 важно
+        qs = qs.filter(title__icontains=q)
+    if lang:
+        qs = qs.filter(language=lang)
+    return render(request, 'core/courses.html', {'courses': qs})
 
-    return render(request, 'courses.html', {'courses': courses})
 
 
 
 @csrf_exempt
 @login_required
 def lesson_detail(request, lesson_id):
-    lesson = get_object_or_404(Lesson, id=lesson_id)
+    lesson = get_object_or_404(Lesson, pk=lesson_id)
     result = None
 
     if request.method == 'POST' and lesson.task_type == 'test':
-        user_answer = request.POST.get('test_answer', '').strip().lower()
-        correct_answer = lesson.test_correct_answer.strip().lower() if lesson.test_correct_answer else ''
+        user_answer    = request.POST.get('test_answer', '').strip().lower()
+        correct_answer = (lesson.test_correct_answer or '').strip().lower()
         result = (user_answer == correct_answer)
 
     return render(request, 'core/lesson_detail.html', {
-        'lesson': lesson,
-        'result': result,
-        'expected_output': lesson.html_expected_code or ''
+        'lesson':         lesson,
+        'video_url':      lesson.video_url,
+        'result':         result,
+        'expected_output': lesson.html_expected_code or '',
     })
+
 
 
 
@@ -252,3 +260,4 @@ def send_temp_password(request):
         except User.DoesNotExist:
             return render(request, 'registration/temp_password_form.html', {'error': 'Пользователь не найден'})
     return render(request, 'registration/temp_password_form.html')
+

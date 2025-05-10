@@ -1,45 +1,121 @@
+/* Переменные для цветов и шрифтов */
+:root {
+  --bg-page: #0f2027;
+  --bg-card: #0e1a24;
+  --bg-button: #072f41;
+  --bg-button-hover: #00bcd4;
+  --accent: #00e5ff;
+  --accent-light: rgba(0, 229, 255, 0.2);
+  --text-main: #ffffff;
+  --text-secondary: #a0a0a0;
+  --font-base: "Segoe UI", sans-serif;
+}
+
+/* Общие стили */
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: var(--font-base);
 }
 
-nav {
-    margin-bottom: 10px;
+.container {
+  max-width: 1200px;
+  margin: 90px auto 30px; /* учёт высоты navbar */
+  padding: 0 20px;
 }
 
-.messages {
-    list-style: none;
-    padding: 0;
+/* Карточки курсов/модулей */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-light);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
+  padding: 20px;
+  margin-bottom: 25px;
+  transition: transform .3s, box-shadow .3s;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
 }
 
-.messages li {
-    background-color: #e0ffe0;
-    border: 1px solid #b2d8b2;
-    padding: 10px;
-    margin-bottom: 10px;
+/* Заголовки */
+.h1, h2 {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent);
+  margin-bottom: 20px;
+}
+.h2-secondary, h3 {
+  color: var(--accent);
+  margin-bottom: 15px;
 }
 
+/* Кнопки и ссылки */
+.btn {
+  display: inline-block;
+  background: linear-gradient(145deg, var(--bg-button), #0b3f59);
+  color: var(--text-main);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid var(--accent-light);
+  box-shadow: 0 0 8px var(--accent-light);
+  transition: transform .3s, box-shadow .3s, background .3s;
+}
+.btn:hover {
+  background: var(--bg-button-hover);
+  box-shadow: 0 0 12px var(--accent);
+  transform: scale(1.03);
+}
+
+/* Формы фильтра и инпуты */
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.filter-form input,
+.filter-form select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-light);
+  background: var(--bg-card);
+  color: var(--accent);
+  box-shadow: inset 0 0 10px rgba(0,229,255,0.2);
+}
+.filter-form button {
+  /* используем .btn */
+}
+
+/* CodeMirror и iframe */
 .CodeMirror {
-    border: 1px solid #ccc;
-    height: 300px;
-    font-size: 14px;
-  }
-  
-  #preview {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  button {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
+  border: 1px solid #555;
+  border-radius: 4px;
+  min-height: 200px;
+}
+#preview {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+/* кнопка-ссылка */
+.btn {
+  display: inline-block;
+  background: linear-gradient(145deg, #072f41, #0b3f59);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+.btn:hover {
+  background: #00bcd4;
+  color: #fff;
+  box-shadow: 0 0 12px #00e5ff;
+  transform: scale(1.03);
+}

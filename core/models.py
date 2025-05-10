@@ -54,13 +54,28 @@ class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=200)
     content = models.TextField()
-    task_type = models.CharField(max_length=10, choices=[
-        ('none', 'Нет задания'),
-        ('test', 'Тест'),
-        ('html', 'HTML/JS задание')
-    ], default='none')
+    task_type = models.CharField(
+        max_length=10,
+        choices=[
+            ('none', 'Нет задания'),
+            ('test', 'Тест'),
+            ('html', 'HTML/JS задание'),
+        ],
+        default='none'
+    )
     html_task_description = models.TextField(blank=True, null=True)
     html_expected_code = models.TextField(blank=True, null=True)
+    video_url = models.URLField(
+        "YouTube-ссылка",
+        blank=True,
+        null=True,
+        help_text="Полная ссылка вида https://www.youtube.com/watch?v=VIDEO_ID"
+    )
+
+    def __str__(self):
+        return f"{self.module.title} — {self.title}"
+
+
 
     def __str__(self):
         return f"{self.module.title} — {self.title}"

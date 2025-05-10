@@ -1,163 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block head_extra %}
-  {# CodeMirror CSS #}
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css"
-  />
+{% block content %}
   <style>
-    .CodeMirror {
-      border: 1px solid #555;
-      border-radius: 4px;
-      min-height: 200px;
+    .btn {
+      display: inline-block;
+      background: linear-gradient(145deg, #072f41, #0b3f59);
+      color: #fff !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(0,229,255,0.2);
+      box-shadow: 0 0 8px rgba(0,229,255,0.2);
+      transition: transform .3s, box-shadow .3s, background .3s;
     }
-    /* Скрываем оригинальные textarea */
-    #htmlCode,
-    #jsCode {
-      display: none !important;
+    .btn:hover {
+      background: #00bcd4;
+      box-shadow: 0 0 12px #00e5ff;
+      transform: scale(1.03);
     }
   </style>
-{% endblock %}
 
-{% block content %}
-<div class="container my-8">
-  <h2 class="text-3xl text-cyan-400 font-semibold mb-4">🔧 {{ module.title }}</h2>
-  <p class="text-slate-300 mb-8">{{ module.description }}</p>
+  <div class="container">
+    <h1 class="h1">🔧 Модуль: {{ module.title }}</h1>
+    <p class="text-secondary mb-6">Курс: {{ module.course.title }}</p>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- HTML -->
-    <div class="flex flex-col">
-      <label class="text-white mb-2 font-medium">HTML-код:</label>
-      <textarea id="htmlCode"><div id="output">Hello</div></textarea>
-      <div id="htmlEditor"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for lesson in lessons %}
+        <div class="card">
+          <h2 class="h2-secondary">{{ lesson.title }}</h2>
+          <a href="{% url 'lesson_detail' lesson.id %}" class="btn">
+            Открыть урок →
+          </a>
+        </div>
+      {% empty %}
+        <p class="text-secondary">Уроков пока нет.</p>
+      {% endfor %}
     </div>
-    <!-- JS -->
-    <div class="flex flex-col">
-      <label class="text-white mb-2 font-medium">JS-код:</label>
-      <textarea id="jsCode">// ваш JS тут</textarea>
-      <div id="jsEditor"></div>
-    </div>
+
+    <p class="mt-8">
+      <a href="{% url 'course_detail' module.course.id %}" class="btn">
+        ← Вернуться к курсу
+      </a>
+    </p>
   </div>
-
-  <button id="runBtn"
-          class="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
-  >Запустить</button>
-
-  <h3 class="text-white font-semibold mt-8 mb-2">Результат:</h3>
-  <iframe
-    id="preview"
-    sandbox="allow-scripts allow-same-origin"
-    class="w-full h-56 bg-white border rounded"
-  ></iframe>
-
-  <div id="feedback" class="mt-4 text-lg font-medium"></div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-  <script>
-    // Ожидаемый вывод из БД или null
-    window.expectedOutput = {{ module.expected_output|default:"null"|escapejs }};
-  </script>
-
-  {# Подключаем CodeMirror #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/xml/xml.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/javascript/javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/edit/closetag.min.js"></script>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1) Инициализируем редакторы
-    const htmlArea = document.getElementById('htmlCode');
-    const jsArea   = document.getElementById('jsCode');
-    window.htmlEditor = CodeMirror(
-      document.getElementById('htmlEditor'),
-      {
-        value: htmlArea.value.trim(),
-        mode: 'xml',
-        htmlMode: true,
-        theme: 'dracula',
-        lineNumbers: true,
-        autoCloseTags: true,
-      }
-    );
-    window.jsEditor = CodeMirror(
-      document.getElementById('jsEditor'),
-      {
-        value: jsArea.value.trim(),
-        mode: 'javascript',
-        theme: 'dracula',
-        lineNumbers: true,
-      }
-    );
-
-    const btn     = document.getElementById('runBtn');
-    const preview = document.getElementById('preview');
-    const fb      = document.getElementById('feedback');
-
-    // Помощник: вытягивает текст из <div id="output">…</div>
-    function extractOutput(html) {
-      const m = html.match(/<div[^>]*id=['"]output['"][^>]*>([\s\S]*?)<\/div>/);
-      return m ? m[1].trim() : '';
-    }
-
-    btn.addEventListener('click', () => {
-      fb.textContent = '';
-      const userHtml = window.htmlEditor.getValue();
-      const userJs   = window.jsEditor.getValue();
-      // Вычисляем expected: из БД или из HTML
-      const expected = window.expectedOutput != null
-        ? String(window.expectedOutput).trim()
-        : extractOutput(userHtml);
-
-      // 2) Навешиваем onload-обработчик перед srcdoc
-      const onLoadHandler = () => {
-        const doc = preview.contentDocument;
-        if (!doc) return;
-        // Инжектим пользовательский JS
-        const s1 = doc.createElement('script');
-        s1.textContent = userJs;
-        doc.body.appendChild(s1);
-        // Инжектим скрипт проверки
-        const s2 = doc.createElement('script');
-        s2.textContent = `
-          (function(){
-            const out = (document.getElementById('output')?.innerText||'').trim();
-            parent.postMessage(out, '*');
-          })();
-        `;
-        doc.body.appendChild(s2);
-        // Снимаем слушатель, чтобы не накопить его
-        preview.removeEventListener('load', onLoadHandler);
-      };
-      preview.addEventListener('load', onLoadHandler);
-
-      // 3) Загружаем чистый HTML
-      preview.srcdoc = `
-        <html><head><meta charset="utf-8"></head>
-        <body>${userHtml}</body>
-        </html>
-      `;
-    });
-
-    // 4) Ловим ответ из iframe и сравниваем
-    window.addEventListener('message', e => {
-      const got = (e.data||'').trim();
-      const userHtml = window.htmlEditor.getValue();
-      const expected = window.expectedOutput != null
-        ? String(window.expectedOutput).trim()
-        : extractOutput(userHtml);
-      fb.innerHTML = got === expected
-        ? '<span class="text-green-400">✅ Верно!</span>'
-        : `<span class="text-red-400">❌ Неверно. Ожидалось: “${expected}”, получено: “${got}”</span>`;
-    });
-  });
-  </script>
 {% endblock %}

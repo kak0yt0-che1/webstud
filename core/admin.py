@@ -9,9 +9,22 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('language',)
     search_fields = ('title', 'description')
 
-# --- Модули и уроки ---
+# --- Модули ---
 admin.site.register(Module)
-admin.site.register(Lesson)
+
+# --- Уроки ---
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ('title', 'module', 'task_type', 'video_url')
+    fields = (
+        'module',
+        'title',
+        'content',
+        'task_type',
+        'html_task_description',
+        'html_expected_code',
+        'video_url',
+    )
 
 # --- Inline для отображения прогресса у пользователя ---
 class ProgressInline(admin.TabularInline):
@@ -19,6 +32,7 @@ class ProgressInline(admin.TabularInline):
     extra = 0
 
 # --- Кастомный UserAdmin ---
+@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     inlines = [ProgressInline]
     list_display = ('username', 'email', 'is_subscribed', 'is_staff')
@@ -30,8 +44,6 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Подписка', {'fields': ('is_subscribed',)}),
     )
-
-admin.site.register(CustomUser, CustomUserAdmin)
 
 # --- Админка для прогресса пользователя ---
 @admin.register(UserLessonProgress)

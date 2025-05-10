@@ -15,8 +15,15 @@ class ModuleForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['module', 'title', 'content', 'task_type', 'html_task_description', 'html_expected_code']
-
+        fields = [
+            'module',
+            'title',
+            'content',
+            'task_type',
+            'html_task_description',
+            'html_expected_code',
+            'video_url',
+        ]
 
 class RegisterForm(UserCreationForm):
     class Meta:
